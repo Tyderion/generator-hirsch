@@ -88,6 +88,13 @@ var HirschGenerator = yeoman.generators.Base.extend({
       default: true
     });
 
+    prompts.push({
+      type: 'confirm',
+      name: 'notify',
+      message: 'Do you want to be notified of build errors?',
+      default: true
+    });
+
 
     prompts.push({
       type: 'confirm',
@@ -120,6 +127,7 @@ var HirschGenerator = yeoman.generators.Base.extend({
       this.prefix = props.prefix;
       this.styleSourcemaps = props.styleSourcemaps;
       this.autoPrefixr = props.autoPrefixr;
+      this.notify = props.notify;
       this.description = props.description;
       this.author = props.author;
       this.useTypescript = props.useTypescript;
@@ -206,6 +214,7 @@ var HirschGenerator = yeoman.generators.Base.extend({
     this.projectConfig.prompts.cssExtension = this.cssExtension;
     this.projectConfig.prompts.styleSourcemaps = this.styleSourcemaps;
     this.projectConfig.prompts.autoPrefixr = this.autoPrefixr;
+    this.projectConfig.prompts.notify = this.notify;
     this.projectConfig.prompts.useLess = this.useLess;
     this.projectConfig.prompts.useSass = this.useSass;
     this.projectConfig.prompts.typingsPath = this.typingsPath;
@@ -264,9 +273,14 @@ var HirschGenerator = yeoman.generators.Base.extend({
         this.copyTpl(this.projectConfig.path.taskDir, 'css!', 'sass.js!');
     }
 
+    if(this.notify){
+        this.copyTpl(this.projectConfig.path.taskDir, 'notify!', 'notifyErrorHandler.js!');
+    }
+
     if(this.autoPrefixr){
         this.copyTpl(this.projectConfig.path.taskDir, 'autoPrefixr!', 'css-auto-prefix.js!');
     }
+
 
     if(this.projectConfig.prompts.useTypescript) {
       this.copyTpl(this.projectConfig.path.taskDir, 'ts!', '*.js!');

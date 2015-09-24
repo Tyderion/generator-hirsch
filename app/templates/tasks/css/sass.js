@@ -8,7 +8,10 @@ var path = require('path');
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;<% if(prompts.styleSourcemaps) {%>
 var sourcemaps = require('gulp-sourcemaps');<% } %><% if(prompts.autoPrefixr) {%>
-var autoprefixer = require('gulp-autoprefixer');<% } %>
+var autoprefixer = require('gulp-autoprefixer');<% } %><% if(prompts.notify) {%>
+var plumber = require('gulp-plumber');
+var errorAlert = require(process.cwd()+'/tasks/notifyErrorHandler.js')("SASS Error")
+<% } %>
 
 /**
  * SASS
@@ -22,8 +25,9 @@ gulp.task('sass', function () {
 
   return gulp
     .src(mainSassFile)<% if(prompts.styleSourcemaps) {%>
-    .pipe(sourcemaps.init()) <% } %>
-    .pipe(sass().on('error', sass.logError))<% if(prompts.autoPrefixr) {%>
+    .pipe(sourcemaps.init()) <% } %><% if(prompts.notify) {%>
+    .pipe(plumber({errorHandler: errorAlert}))<% } %>
+    .pipe(sass()<% if(!prompts.notify) {%>.on('error', sass.logError)<% } %>)<% if(prompts.autoPrefixr) {%>
     .pipe(autoprefixer({
             browsers: projectConfig.autoprefixer.browsers,
             cascade: false,
