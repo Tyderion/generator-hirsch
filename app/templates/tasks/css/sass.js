@@ -10,7 +10,15 @@ var reload = browserSync.reload;<% if(prompts.styleSourcemaps) {%>
 var sourcemaps = require('gulp-sourcemaps');<% } %><% if(prompts.autoPrefixr) {%>
 var autoprefixer = require('gulp-autoprefixer');<% } %><% if(prompts.notify) {%>
 var plumber = require('gulp-plumber');
-var errorAlert = require(process.cwd()+'/tasks/notifyErrorHandler.js')("SASS Error")
+var errorAlert = require(process.cwd()+'/tasks/notifyErrorHandler.js')("SASS Error", function(error) {
+    var filePath = path.parse(error.filename);
+    var srcDir = filePath;
+    while (srcDir.base !== projectConfig.path.assetsDir) {
+      srcDir = path.parse(path.relative('..',srcDir.dir));
+    }
+    var errorText = "File: " +srcDir.dir + filePath.base+":"+error.line+":"+error.column + "\nError: " + error.extract;;
+    return errorText;
+})
 <% } %>
 
 /**
